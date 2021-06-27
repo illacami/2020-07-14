@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import it.polito.tdp.PremierLeague.model.Action;
 import it.polito.tdp.PremierLeague.model.Match;
 import it.polito.tdp.PremierLeague.model.Player;
@@ -36,9 +38,8 @@ public class PremierLeagueDAO {
 		}
 	}
 	
-	public List<Team> listAllTeams(){
+	public void listAllTeams(Map<Integer, Team>  idMap){
 		String sql = "SELECT * FROM Teams";
-		List<Team> result = new ArrayList<Team>();
 		Connection conn = DBConnect.getConnection();
 
 		try {
@@ -47,14 +48,15 @@ public class PremierLeagueDAO {
 			while (res.next()) {
 
 				Team team = new Team(res.getInt("TeamID"), res.getString("Name"));
-				result.add(team);
+				idMap.put(res.getInt("TeamID"), team);
+				this.calcolaPunteggioTeam(team);
 			}
 			conn.close();
-			return result;
+			return;
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return null;
+			return;
 		}
 	}
 	
@@ -109,6 +111,40 @@ public class PremierLeagueDAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
+		}
+	}
+	
+	public void calcolaPunteggioTeam(Team team) {
+		String sql = "SELECT ResultOfTeamHome "
+				+ "FROM Matches "
+				+ "WHERE TeamHomeID = ? ";
+		int result = 0;
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, team.getTeamID());
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+				
+				int punteggio =-1;
+				if(res.getInt("ResultOfTeamHome") == -1) {
+					punteggio = 0;
+				}else if(res.getInt("ResultOfTeamHome") == 0) {
+					punteggio = 1;
+				}else if(res.getInt("ResultOfTeamHome") == 1) {
+					punteggio = 3;
+				}
+				
+				result += punteggio;
+			}
+			conn.close();
+			team.setPunteggio(result);
+			return ;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return ;
 		}
 	}
 	

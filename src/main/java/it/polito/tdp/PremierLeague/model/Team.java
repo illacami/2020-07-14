@@ -3,6 +3,15 @@ package it.polito.tdp.PremierLeague.model;
 public class Team {
 	Integer teamID;
 	String name;
+	Integer punteggio;
+
+	public Integer getPunteggio() {
+		return punteggio;
+	}
+
+	public void setPunteggio(Integer punteggio) {
+		this.punteggio = punteggio;
+	}
 
 	public Team(Integer teamID, String name) {
 		super();
