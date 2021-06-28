@@ -8,6 +8,7 @@ public class TestModel {
 		
 		model.creaGrafo();
 
+		model.classifica(new Team(3,"Arsenal"));
 	}
 
 }

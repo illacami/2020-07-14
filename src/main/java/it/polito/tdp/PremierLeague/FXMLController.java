@@ -5,9 +5,12 @@
 package it.polito.tdp.PremierLeague;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.PremierLeague.model.Model;
+import it.polito.tdp.PremierLeague.model.Team;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -35,7 +38,7 @@ public class FXMLController {
     private Button btnSimula; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbSquadra"
-    private ComboBox<?> cmbSquadra; // Value injected by FXMLLoader
+    private ComboBox<Team> cmbSquadra; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtN"
     private TextField txtN; // Value injected by FXMLLoader
@@ -49,11 +52,27 @@ public class FXMLController {
     @FXML
     void doClassifica(ActionEvent event) {
 
+    	Team team = cmbSquadra.getValue();
+//    	Map<Team, Double > classifica = new HashMap<Team,Double>(model.classifica(team));
+    	
+    	txtResult.appendText("\nSQUADRE MIGLIORI:\n");
+    	
+    	for(Team t : model.getVertici()) 
+    		if(model.classifica(team).get(t) > 0)
+    			txtResult.appendText(t.getName()+"("+model.classifica(team).get(t)+")\n");
+    	
+    	txtResult.appendText("\nSQUADRE PEGGIORI:\n");
+    	for(Team t : model.getVertici()) 
+    		if(model.classifica(team).get(t) < 0)
+    			txtResult.appendText(t.getName()+"("+-model.classifica(team).get(t)+")\n");
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
 
+    	model.creaGrafo();
+    	
+    	txtResult.setText("GRAFO CREATO\n# Vertici: "+model.getVertici().size()+"\n# Archi: "+model.getEdgeSize());
     }
 
     @FXML
@@ -74,5 +93,7 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	
+    	cmbSquadra.getItems().setAll(model.getVertici());
     }
 }
